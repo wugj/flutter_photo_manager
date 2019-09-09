@@ -1,13 +1,14 @@
-package top.kikt.imagescanner.core.thumb
+package top.kikt.imagescanner.thumb
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.transition.Transition
+import com.bumptech.glide.request.animation.GlideAnimation
+import com.bumptech.glide.request.target.SimpleTarget
 import io.flutter.plugin.common.MethodChannel
 import top.kikt.imagescanner.Asset
-import top.kikt.imagescanner.core.ResultHandler
+import top.kikt.imagescanner.ResultHandler
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -18,12 +19,11 @@ object ThumbnailUtil {
 
     fun getThumbnailByGlide(ctx: Context, path: String, width: Int, height: Int, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result)
-
         Glide.with(ctx)
-                .asBitmap()
                 .load(File(path))
-                .into(object : CustomTarget<Bitmap>(width, height) {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                .asBitmap()
+                .into(object : SimpleTarget<Bitmap>(width, height) {
+                    override fun onResourceReady(resource: Bitmap, glideAnimation: GlideAnimation<in Bitmap>?) {
                         val bos = ByteArrayOutputStream()
                         resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
                         resultHandler.reply(bos.toByteArray())
@@ -33,20 +33,21 @@ object ThumbnailUtil {
                         resultHandler.reply(null)
                     }
 
-                    override fun onLoadFailed(errorDrawable: Drawable?) {
+                    override fun onLoadFailed(e: Exception, errorDrawable: Drawable?) {
                         resultHandler.reply(null)
                     }
                 })
+
     }
 
     fun getThumbnailWithVideo(ctx: Context, asset: Asset, width: Int, height: Int, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result)
 
         Glide.with(ctx)
-                .asBitmap()
                 .load(File(asset.path))
-                .into(object : CustomTarget<Bitmap>(width, height) {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                .asBitmap()
+                .into(object : SimpleTarget<Bitmap>(width, height) {
+                    override fun onResourceReady(resource: Bitmap, glideAnimation: GlideAnimation<in Bitmap>?) {
                         val bos = ByteArrayOutputStream()
                         resource.compress(Bitmap.CompressFormat.JPEG, 100, bos)
                         resultHandler.reply(bos.toByteArray())
