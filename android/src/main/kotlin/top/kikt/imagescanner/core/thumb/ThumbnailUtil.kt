@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.animation.GlideAnimation
 import com.bumptech.glide.request.target.SimpleTarget
 import io.flutter.plugin.common.MethodChannel
@@ -19,9 +20,10 @@ object ThumbnailUtil {
 
     fun getThumbnailByGlide(ctx: Context, path: String, width: Int, height: Int, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result)
-        Glide.with(ctx)
-                .load(File(path))
+        Glide.with(ctx.applicationContext)
+                .load(path)
                 .asBitmap()
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(object : SimpleTarget<Bitmap>(width, height) {
                     override fun onResourceReady(resource: Bitmap, glideAnimation: GlideAnimation<in Bitmap>?) {
                         val bos = ByteArrayOutputStream()
@@ -43,7 +45,7 @@ object ThumbnailUtil {
     fun getThumbnailWithVideo(ctx: Context, asset: Asset, width: Int, height: Int, result: MethodChannel.Result) {
         val resultHandler = ResultHandler(result)
 
-        Glide.with(ctx)
+        Glide.with(ctx.applicationContext)
                 .load(File(asset.path))
                 .asBitmap()
                 .into(object : SimpleTarget<Bitmap>(width, height) {
